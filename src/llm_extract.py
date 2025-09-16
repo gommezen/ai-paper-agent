@@ -1,15 +1,16 @@
 # src/llm_extract.py  — OpenAI SDK ≥ 1.0, project-aware, graceful fallback
 
-import os, json
-from typing import Dict, Any
-from pydantic import ValidationError
+import json
+import os
+from typing import Any, Dict
+
 from dotenv import load_dotenv
+# OpenAI SDK (new)
+from openai import AuthenticationError, BadRequestError, OpenAI, RateLimitError
+from pydantic import ValidationError
 
 from .schema import ArticleSummary
 from .utils import unique_sorted_pages
-
-# OpenAI SDK (new)
-from openai import OpenAI, AuthenticationError, RateLimitError, BadRequestError
 
 load_dotenv()  # read .env if present
 
@@ -19,21 +20,25 @@ TEMPLATE_SYSTEM = (
     "Include short, clear bullet points and page numbers (1-indexed) for evidence."
 )
 
-# what is this block doing? 
+
+# what is this block doing?
 # Build a user prompt with paper metadata and available sections
 # If title/citation missing, use placeholders
 # List available sections
 # Instruct to fill all fields succinctly, leaving empty strings/[] if unknown
 # Return the constructed prompt as a single string
-# 
+#
 def _build_user_prompt(metadata: Dict[str, Any], sections: Dict[str, str]) -> str:
     title = metadata.get("title") or "Unknown Title"
     citation = metadata.get("citation") or ""
     p = [f"Paper: {title}", f"Citation: {citation}", "Sections provided:"]
     for k in sections.keys():
         p.append(f"- {k}")
-    p.append("Fill all template fields succinctly. If unknown, leave empty strings and [] for pages.")
+    p.append(
+        "Fill all template fields succinctly. If unknown, leave empty strings and [] for pages."
+    )
     return "\n".join(p)
+
 
 def _fwe():
     return {
@@ -45,6 +50,7 @@ def _fwe():
         "required": ["text", "evidence_pages"],
         "additionalProperties": False,
     }
+
 
 def _schema_json():
     # Define properties once
@@ -79,9 +85,13 @@ def _schema_json():
         "additionalProperties": False,
     }
 
+
 def _mock_output(metadata: Dict[str, Any]) -> Dict[str, Any]:
     citation = metadata.get("citation", "")
-    def mk(txt=""): return {"text": txt, "evidence_pages": []}
+
+    def mk(txt=""):
+        return {"text": txt, "evidence_pages": []}
+
     return {
         "citation": citation,
         "about_main_questions": mk(""),
@@ -102,6 +112,7 @@ def _mock_output(metadata: Dict[str, Any]) -> Dict[str, Any]:
         "future_extensions": mk(""),
         "future_your_ideas": mk(""),
     }
+
 
 def _read_structured_or_json(resp, metadata: Dict[str, Any]) -> Dict[str, Any]:
     """
@@ -126,7 +137,10 @@ def _read_structured_or_json(resp, metadata: Dict[str, Any]) -> Dict[str, Any]:
         print("   Falling back to mock output.")
         return _mock_output(metadata)
 
-def extract_with_llm(metadata: Dict[str, Any], sections: Dict[str, str]) -> Dict[str, Any]:
+
+def extract_with_llm(
+    metadata: Dict[str, Any], sections: Dict[str, str]
+) -> Dict[str, Any]:
     """
     Uses OpenAI SDK ≥ 1.0. Supports project-scoped keys (sk-proj-…) via OPENAI_PROJECT.
     Falls back to mock (empty fields) on missing key or API errors so the pipeline still completes.
@@ -172,15 +186,18 @@ def extract_with_llm(metadata: Dict[str, Any], sections: Dict[str, str]) -> Dict
             },
             "messages": [
                 {"role": "system", "content": TEMPLATE_SYSTEM},
+                +{"role": "user", "content": user_prompt},
                 {
                     "role": "user",
-                    "content": json.dumps({
-                        "sections": sections,
-                        "instructions": (
-                            "Return a JSON object strictly matching the schema. "
-                            "Bullet points welcome. Provide evidence page numbers as a list of integers."
-                        ),
-                    }),
+                    "content": json.dumps(
+                        {
+                            "sections": sections,
+                            "instructions": (
+                                "Return a JSON object strictly matching the schema. "
+                                "Bullet points welcome. Provide evidence page numbers as a list of integers."
+                            ),
+                        }
+                    ),
                 },
             ],
             "max_completion_tokens": 1200,
@@ -211,13 +228,15 @@ def extract_with_llm(metadata: Dict[str, Any], sections: Dict[str, str]) -> Dict
                     {"role": "system", "content": TEMPLATE_SYSTEM},
                     {
                         "role": "user",
-                        "content": json.dumps({
-                            "sections": sections,
-                            "instructions": (
-                                "Return a JSON object strictly matching the schema. "
-                                "Bullet points welcome. Provide evidence page numbers as a list of integers."
-                            ),
-                        }),
+                        "content": json.dumps(
+                            {
+                                "sections": sections,
+                                "instructions": (
+                                    "Return a JSON object strictly matching the schema. "
+                                    "Bullet points welcome. Provide evidence page numbers as a list of integers."
+                                ),
+                            }
+                        ),
                     },
                 ],
             )

@@ -1,5 +1,5 @@
 import fitz  # PyMuPDF
-from typing import List, Dict
+
 
 class PDFDoc:
     def __init__(self, path: str):
@@ -7,7 +7,7 @@ class PDFDoc:
         self.doc = fitz.open(path)
         self.pages = [p.get_text("text") for p in self.doc]  # simple text mode
         # Build a quick map of page index -> text
-        self.page_map = {i+1: self.pages[i] for i in range(len(self.pages))}
+        self.page_map = {i + 1: self.pages[i] for i in range(len(self.pages))}
 
     def num_pages(self) -> int:
         return len(self.pages)

@@ -1,9 +1,15 @@
-from pydantic import BaseModel, Field
 from typing import List, Optional
+
+from pydantic import BaseModel, Field
+
 
 class FieldWithEvidence(BaseModel):
     text: str = Field(default_factory=str)
-    evidence_pages: List[int] = Field(default_factory=list, description="Page numbers (1-indexed) supporting the text.")
+    evidence_pages: List[int] = Field(
+        default_factory=list,
+        description="Page numbers (1-indexed) supporting the text.",
+    )
+
 
 class ArticleSummary(BaseModel):
     citation: str = ""

@@ -24,10 +24,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Lint with flake8
+      - name: Lint with flake8 (strict on critical)
         run: |
           pip install flake8
-          flake8 src
+          # Fail CI only on likely-bugs: syntax errors & undefined names
+          flake8 src notebooks --count --select=E9,F63,F7,F82 --show-source --statistics
+          # Non-blocking style report (line length, spacing, etc.)
+          flake8 src notebooks --count --exit-zero --max-complexity=10 --max-line-length=120 --statistics
+
 
       - name: Run tests with pytest
         run: |

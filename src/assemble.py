@@ -1,5 +1,7 @@
-from typing import Dict, Any
+# from typing import Any, Dict
+
 from .schema import ArticleSummary
+
 
 def assemble_summary(metadata: dict, sections: dict, llm_json: dict) -> ArticleSummary:
     summary = ArticleSummary(**llm_json)
