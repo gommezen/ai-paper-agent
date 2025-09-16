@@ -1,0 +1,7 @@
+pymupdf==1.24.8
+pydantic==2.8.2
+python-dotenv==1.0.1
+tqdm==4.66.4
+pandas==2.2.2
+openai==1.40.8
+pyyaml==6.0.2
