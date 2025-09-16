@@ -14,3 +14,7 @@ outputs/
 # OS junk
 .DS_Store
 Thumbs.db
+
+# User papers (never commit to repo — place your own PDFs here when running locally)
+data/my_papers/*
+!data/my_papers/.gitkeep
