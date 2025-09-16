@@ -6,6 +6,9 @@ An **AI-powered pipeline** for summarizing academic PDFs into structured Markdow
 
 ---
 
+![Jupyter](https://img.shields.io/badge/Jupyter-Notebook-orange?logo=jupyter)
+
+
 ## 📚 Table of Contents
 - [✨ Features](#-features)
 - [🚀 Quickstart](#-quickstart)
