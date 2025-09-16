@@ -1,5 +1,6 @@
-# AI Paper Agent — Starter Repo
-[![CI - Summarizer](https://github.com/<YOUR_USERNAME>/<YOUR_REPO>/actions/workflows/ci.yml/badge.svg)](https://github.com/<YOUR_USERNAME>/<YOUR_REPO>/actions/workflows/ci.yml)
+# AI Paper Agent
+
+[![CI - Summarizer](https://github.com/<gommezen>/<ai-paper-agent>/actions/workflows/ci.yml/badge.svg)](https://github.com/<gommezen>/<ai-paper-agent>/actions/workflows/ci.yml)
 
 An **AI-powered pipeline** for summarizing academic PDFs into structured Markdown, JSON, and CSV — with page-anchored evidence and a reproducible CI/CD flow.
 
@@ -99,13 +100,10 @@ A worked example is in notebooks/01_single_pdf_demo.ipynb with data/sample/sampl
 ---
 ✅ Continuous Integration
 
-Linting with flake8
-
-Tests with pytest (tests/test_basic.py included)
-
-Full pipeline run on data/sample/sample.pdf
-
-Outputs uploaded as GitHub Action artifacts
+- Linting with flake8
+- Tests with pytest (tests/test_basic.py included)
+- Full pipeline run on data/sample/sample.pdf
+- Outputs uploaded as GitHub Action artifacts
 ---
 
 📜 License
