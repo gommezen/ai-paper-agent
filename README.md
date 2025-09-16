@@ -1,88 +1,113 @@
 # AI Paper Agent — Starter Repo
+[![CI - Summarizer](https://github.com/<YOUR_USERNAME>/<YOUR_REPO>/actions/workflows/ci.yml/badge.svg)](https://github.com/<YOUR_USERNAME>/<YOUR_REPO>/actions/workflows/ci.yml)
 
-A minimal, extensible agent for **reading academic articles**, **auto-filling a structured template**, and **exporting** to Markdown/CSV — with **page-anchored citations**.
-
-> Works locally in VS Code or Jupyter. Uses PyMuPDF for parsing; optional ChatGPT extraction via the OpenAI API (falls back to simple heuristics if no API key).
-
----
-
-## Features
-
-- 🧭 **Template-first extraction** (About, Methods & Data, Analysis, Results, Future Work)
-- 📄 **Page-anchored evidence** (`evidence_pages` per field)
-- 🧩 Modular pipeline (`parse → section → LLM extract → assemble → export`)
-- 📦 **Batch mode**: drop a folder of PDFs → summaries + a master CSV
-- 🧪 **Mock mode** when `OPENAI_API_KEY` is missing (runs without network)
+An **AI-powered pipeline** for summarizing academic PDFs into structured Markdown, JSON, and CSV — with page-anchored evidence and a reproducible CI/CD flow.
 
 ---
 
-## Quickstart
+## 📚 Table of Contents
+- [✨ Features](#-features)
+- [🚀 Quickstart](#-quickstart)
+- [⚙️ Configuration](#️-configuration)
+- [🛠️ Pipeline](#️-pipeline)
+- [📑 Template](#-template)
+- [🔧 Extending](#-extending)
+- [✅ Continuous Integration](#-continuous-integration)
+- [📜 License](#-license)
+
+---
+
+## ✨ Features
+- 🧭 **Template-first extraction**: About, Methods, Analysis, Results, Future
+- 📄 **Page-anchored evidence**: each field links back to source pages
+- 📦 **Batch mode**: process a folder of PDFs at once
+- 🔒 **Mock mode**: runs without API key (offline safe)
+- ✅ **CI-ready**: GitHub Actions runs linting, pytest, and pipeline with `data/sample/sample.pdf`
+
+---
+
+## 🚀 Quickstart
 
 ```bash
 # 1) Create & activate a virtual environment
 python -m venv .venv
 source .venv/bin/activate   # Windows: .venv\Scripts\activate
 
-# 2) Install deps
+# 2) Install dependencies
 pip install -r requirements.txt
 
-# 3) Configure env (optional for real LLM extraction)
+# 3) Configure environment (optional for real LLM extraction)
 cp .env.example .env
-# then edit .env and add your key
+# edit .env and add your API key + project ID if needed
 
-# 4) Run a single PDF (sample provided)
+# 4) Run pipeline on the sample PDF
 python -m src.batch data/sample --out_dir outputs
 
-# 5) Open the demo notebook
+# 5) Explore in Jupyter
 jupyter notebook notebooks/01_single_pdf_demo.ipynb
 ```
 
 Outputs will appear in:
-- `outputs/summaries/<paper_name>.md`
-- `outputs/csv/master_table.csv` (one row per paper)
+
+outputs/summaries/<paper_name>.md
+
+outputs/csv/master_table.csv (one row per paper)
+
+outputs/summaries/<paper_name>.json (raw structured output)
 
 ---
 
-## Configuration
+⚙️ Configuration
 
 Create `.env` (or edit environment variables):
 
 ```
-OPENAI_API_KEY=sk-...
-OPENAI_MODEL=gpt-5-mini
-TEMPERATURE=0.0
+OPENAI_API_KEY=sk-...        # your API key (use GitHub Secrets in CI)
+OPENAI_PROJECT=proj_...      # optional: project-scoped keys
+OPENAI_MODEL=gpt-4.1-mini    # or gpt-5-mini if available
+TEMPERATURE=1
 ```
 
-You can also set these via command line flags.
+In CI/CD, keys are injected via GitHub Secrets — never commit them to .env.
 
 ---
 
-## Pipeline
+🛠️ Pipeline
 
-1. **Parse**: `PyMuPDF` loads text page-by-page and creates a page map.
-2. **Section**: simple heuristics to segment Abstract/Intro/Methods/Results/Discussion/Conclusion/Refs.
-3. **Extract**: prompts the LLM with **strict JSON schema** (see `schema.py`). If no key, uses mock extractor.
-4. **Assemble**: merges fields into your **Article Summary Template** (+ page evidence).
-5. **Export**: Markdown note (Obsidian/Notion-friendly) + CSV row; saves raw JSON too.
-
----
-
-## Your Template (used in exports)
-
-See `src/schema.py` for the canonical schema and `notebooks/01_single_pdf_demo.ipynb` for a rendered template.
-A filled example for *How People Use ChatGPT (2025)* is included in the notebook.
+1. Parse: PyMuPDF loads text page-by-page
+2. Section: heuristics split into Abstract / Methods / Results / Conclusion
+3. Extract: prompts the LLM with strict JSON schema (schema.py)
+4. Assemble: merges fields into structured Article Summary Template
+5. Export: saves Markdown, JSON, and appends to master CSV
 
 ---
 
-## Extending
+📑 Template
 
-- Add new fields to `Schema` in `src/schema.py`.
-- Customize prompts in `src/llm_extract.py`.
-- Improve sectioning by swapping in GROBID or science-parse.
-- Add integrations (Zotero/Notion) in `src/export.py`.
+The canonical schema is in src/schema.py.
+A worked example is in notebooks/01_single_pdf_demo.ipynb with data/sample/sample.pdf.
 
 ---
 
-## License
+🔧 Extending
+
+- Add new fields → src/schema.py
+- Customize prompts → src/llm_extract.py
+- Improve sectioning → integrate GROBID or science-parse
+- Add new exports → extend src/export.py (Zotero, Notion, etc.)
+
+---
+✅ Continuous Integration
+
+Linting with flake8
+
+Tests with pytest (tests/test_basic.py included)
+
+Full pipeline run on data/sample/sample.pdf
+
+Outputs uploaded as GitHub Action artifacts
+---
+
+📜 License
 
 MIT
